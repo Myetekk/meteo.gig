@@ -1,7 +1,10 @@
 import tkinter as tk
 import urllib.request  
-import json
+import time
+import datetime
 import os
+import threading
+from pyModbusTCP.server import ModbusServer, DataBank
 
 
 
@@ -9,19 +12,30 @@ import os
 
 class Meteo:
     arrayText = []
-    arrayCurrentText = []
     arrayHeaderTextLine0 = []
     arrayHeaderTextLine1 = []
+    arrayCurrentText = []
     
-    arrayCurrent = []
     arrayHeader = []
+    arrayCurrent = []
+
+    arrayCurrentModbus = []
+    
+    dataBank = DataBank()
 
 
     
     def main(self):
+        ## host modbus server
+        self.server = ModbusServer(host='0.0.0.0', port=502, no_block=True, data_bank=self.dataBank)
+        self.server.start()
+
+        ## life signal
+        inteager_thread = threading.Thread(target=self.sendModbusLifeSignal, daemon=True)
+        inteager_thread.start()
+
         self.getData()
-        # self.printElements()
-        
+        self.Modbus()
         self.createInterface()
 
 
@@ -29,7 +43,7 @@ class Meteo:
     def getData(self):
         self.getDataText()
         self.makeHeaders()
-        self.getCurrent()
+        self.makeCurrent()
 
 
 
@@ -65,7 +79,7 @@ class Meteo:
 
 
     
-    def getCurrent(self):
+    def makeCurrent(self):
         self.arrayCurrent = self.arrayCurrentText.split()
 
     
@@ -97,13 +111,87 @@ class Meteo:
         dataFrame = tk.Frame(self.window)
         secondColumn = 0
         for index in range(len(self.arrayHeader)):
+            rowIndex = index
             if (index >= len(self.arrayHeader)/2): 
                 secondColumn = 3
-                index -= int(len(self.arrayHeader)/2)
-            tk.Label(dataFrame, text=(self.arrayHeader[index])).grid(row=index+1, column=(0+secondColumn), sticky='E', padx=5)
-            tk.Label(dataFrame, text=(self.arrayCurrent[index])).grid(row=index+1, column=(1+secondColumn), sticky='W', padx=5)
-            tk.Label(dataFrame, text=('|')).grid(row=index+1, column=(2), padx=15)
+                rowIndex -= int(len(self.arrayHeader)/2)
+            tk.Label(dataFrame, text=(self.arrayHeader[index])).grid(row=rowIndex+1, column=(0+secondColumn), sticky='E', padx=5)
+            tk.Label(dataFrame, text=(self.arrayCurrent[index])).grid(row=rowIndex+1, column=(1+secondColumn), sticky='W', padx=5)
+            tk.Label(dataFrame, text=('|')).grid(row=rowIndex+1, column=(2), padx=15)
         dataFrame.pack(padx=40, pady=15)
+
+
+
+
+
+    def Modbus(self):
+        self.prepareModbus()
+        self.sendModbus()
+
+
+
+    def prepareModbus(self):
+        arrayCurrentModbusTemp = self.arrayCurrent
+        
+        for index in range(len(arrayCurrentModbusTemp)):
+            try:
+                self.arrayCurrentModbus.append(float(arrayCurrentModbusTemp[index]))
+
+            except Exception as e:
+                if arrayCurrentModbusTemp[index].find("---") != -1:  ## no data / error
+                    self.arrayCurrentModbus[index].append(0)
+                
+                ## wind directions
+                elif arrayCurrentModbusTemp[index].find("N") != -1:  ## wind direction NORTH- 1
+                    self.arrayCurrentModbus.append(1)
+                elif arrayCurrentModbusTemp[index].find("E") != -1:  ## wind direction EAST-  2
+                    self.arrayCurrentModbus.append(2)
+                elif arrayCurrentModbusTemp[index].find("S") != -1:  ## wind direction SOUTH- 3
+                    self.arrayCurrentModbus.append(3)
+                elif arrayCurrentModbusTemp[index].find("W") != -1:  ## wind direction WEST-  4
+                    self.arrayCurrentModbus.append(4)
+
+                elif arrayCurrentModbusTemp[index].find("-") != -1:  ## date
+                    sliced = arrayCurrentModbusTemp[index].split('-')
+                    self.arrayCurrentModbus.append(2000+int(sliced[0]))
+                    self.arrayCurrentModbus.append(int(sliced[1]))
+                    self.arrayCurrentModbus.append(int(sliced[2]))
+                elif arrayCurrentModbusTemp[index].find(":") != -1:  ## time
+                    sliced = arrayCurrentModbusTemp[index].split(':')
+                    self.arrayCurrentModbus.append(int(sliced[0]))
+                    self.arrayCurrentModbus.append(int(sliced[1]))
+                    
+                else:
+                    self.arrayCurrentModbus.append(arrayCurrentModbusTemp[index])
+    
+
+
+    def sendModbus(self):
+        date = datetime.datetime.now()
+
+        ## clear list
+        blancList = []
+        for i in range(125):   blancList += [0] 
+        self.dataBank.set_input_registers(address=0, word_list=blancList)
+
+        ## sets date and time
+        dateList = [date.year] + [date.month] + [date.day] + [date.hour] + [date.minute] + [date.second]
+        self.dataBank.set_input_registers(address=0, word_list=dateList) 
+
+
+        dateList = self.arrayCurrentModbus
+        self.dataBank.set_input_registers(address=10, word_list=dateList) 
+
+    
+
+
+    def sendModbusLifeSignal(self):
+        integer = 0
+        while True:
+            self.dataBank.set_input_registers(address=6, word_list=[integer])
+            integer += 1
+            if integer == 10: integer=0
+            time.sleep(1)
 
     
 
@@ -131,3 +219,14 @@ class Meteo:
 if __name__ == '__main__':
     meteo = Meteo()
     meteo.main()
+
+
+
+
+
+## TO DO
+## - zapętlić 
+## - pozabezpieczać 
+
+## PYTANIA
+## - wystarczą w formie intów czy robić na floaty? 
