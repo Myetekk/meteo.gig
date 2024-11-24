@@ -272,6 +272,7 @@ class Meteo:
             
             if self.tryInternetConnection():  self.getData()
             self.populateInterface()
+            self.Modbus()
 
             loadSettings(self.settings)
             self.afterFunc = self.window.after(self.settings.updateTime*1000, self.updateData)
@@ -372,25 +373,4 @@ class Meteo:
 if __name__ == '__main__':
     meteo = Meteo()
     meteo.main()
-
-
-
-
-
-## TO DO
-
-
-
-## DO DO
-## + logować dane i errory 
-## + pozabezpieczać 
-## + zapętlić 
-## + zapezpieczyć przed "HTTP Error 500: Internal Server Error"
-## + ustawienia w pliku
-## + brak internetu
-
-
-
-## PYTANIA
-## - wystarczą w formie intów czy robić na floaty? 
-## - jak często ma się odświeżać? 
+    
