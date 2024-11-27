@@ -10,11 +10,12 @@ import datetime
 ## ustawia ustawienia domyślne i zapisuje w pliku JSON 
 def createDefaultSettings(settings):
     settings.updateTime = 600
+    settings.port = 502
 
     try:
         if os.path.exists("outputs") == False: os.mkdir("outputs") 
         with open("outputs\\settings.json", "w") as outfile:
-            data = { "updateTime": int(settings.updateTime) }
+            data = { "updateTime": int(settings.updateTime), "port": int(settings.port) }
             json_object = json.dumps(data, indent=3)
             outfile.write(json_object)
 
@@ -34,11 +35,13 @@ def loadSettings(settings):
     try:
         if os.path.exists(filePath):  ## jeśli plik istnieje 
             fileSize = os.path.getsize(filePath)
-            if fileSize >= 20  and  fileSize <= 40:  ## jeśli plik ma w sobie jakieś dane i są odpowiednio długie
+            
+            if fileSize >= 35  and  fileSize <= 60:  ## jeśli plik ma w sobie jakieś dane i są odpowiednio długie
                 with open(filePath) as outfile:
                     data = json.load(outfile)
 
                     settings.updateTime = int(data["updateTime"])
+                    settings.port = int(data["port"])
             else: 
                 createDefaultSettings(settings)
         else:

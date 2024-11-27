@@ -5,6 +5,7 @@ import datetime
 import os
 import sqlite3
 import threading
+
 from pyModbusTCP.server import ModbusServer, DataBank
 from settingsOperations import loadSettings
 
@@ -38,16 +39,17 @@ class Meteo:
 
     
     def main(self):
+        ## load settings
+        self.settings = Settings()
+        loadSettings(self.settings)
+
         ## host modbus server
-        self.server = ModbusServer(host='0.0.0.0', port=502, no_block=True, data_bank=self.dataBank)
+        self.server = ModbusServer(host='0.0.0.0', port=self.settings.port, no_block=True, data_bank=self.dataBank)
         self.server.start()
 
         ## send life signal
         inteager_thread = threading.Thread(target=self.sendModbusLifeSignal, daemon=True)
         inteager_thread.start()
-        
-        self.settings = Settings()
-        loadSettings(self.settings)
 
         if self.tryInternetConnection():  self.getData()
         self.Modbus()
@@ -139,7 +141,7 @@ class Meteo:
             self.arrayCurrentModbus.clear()
             for index in range(len(arrayCurrentModbusTemp)):
                 try:
-                    self.arrayCurrentModbus.append(float(arrayCurrentModbusTemp[index]))
+                    self.arrayCurrentModbus.append(float(arrayCurrentModbusTemp[index])*10)
 
                 except Exception as e:
                     if arrayCurrentModbusTemp[index].find("---") != -1:  ## no data / error
@@ -269,12 +271,12 @@ class Meteo:
         try:
             print("updating " + str(datetime.datetime.now())[:19] + "..")
             self.dataFrame.destroy()
+
+            loadSettings(self.settings)
             
             if self.tryInternetConnection():  self.getData()
             self.populateInterface()
             self.Modbus()
-
-            loadSettings(self.settings)
             self.afterFunc = self.window.after(self.settings.updateTime*1000, self.updateData)
 
             self.errors = 0
