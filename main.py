@@ -71,10 +71,10 @@ class Meteo:
     def getDataText(self):
         try:
             url = "https://meteo.gig.eu/archiwum/aktualne.txt"
-            file = request.urlopen(url, timeout=5)
+            # file = request.urlopen(url, timeout=5)
 
-            # context = ssl._create_unverified_context()
-            # file = request.urlopen(url, timeout=5, context=context)
+            context = ssl._create_unverified_context()
+            file = request.urlopen(url, timeout=5, context=context)
 
             self.arrayText = []
 
