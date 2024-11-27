@@ -1,5 +1,6 @@
 import tkinter as tk
-import urllib.request  
+import ssl
+from urllib import request
 import time
 import datetime
 import os
@@ -70,7 +71,11 @@ class Meteo:
     def getDataText(self):
         try:
             url = "https://meteo.gig.eu/archiwum/aktualne.txt"
-            file = urllib.request.urlopen(url, timeout=5)
+            file = request.urlopen(url, timeout=5)
+
+            # context = ssl._create_unverified_context()
+            # file = request.urlopen(url, timeout=5, context=context)
+
             self.arrayText = []
 
             for line in file:
@@ -300,10 +305,10 @@ class Meteo:
     ## checks whether app can access internet
     def tryInternetConnection(self):
         try:
-            urllib.request.urlopen('https://www.google.com', timeout=5)
+            request.urlopen('https://www.google.com', timeout=5)
             return True
         
-        except urllib.request.URLError as err: 
+        except Exception as err: 
             print('no internet connection')
             self.saveLogsError('no internet connection', "tryInternetConnection")
             return False
