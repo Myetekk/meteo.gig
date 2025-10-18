@@ -1,75 +1,58 @@
-# Programpobierającyaktualnąpogodę
+# Program pobierający aktualną pogodę
 
 ## Wstęp
 
 ```
-Programpobierającyaktualnedanezdotyczącepogodyzestrony
-meteo.gig.eu/archiwum/aktualne.txt,obrabia,pokazujeitransmitujejeprzypomocy
-protokołuModbusTCP.
-PobranedaneibłędyzapisywanesąwbaziedanychSQLitewlokalizacji
-“outputs\logs.db”
+Programpobierającyaktualnedanezdotyczącepogodyzestrony meteo.gig.eu/archiwum/aktualne.txt,obrabia,pokazujeitransmitujejeprzypomocy protokołuModbusTCP. PobranedaneibłędyzapisywanesąwbaziedanychSQLitewlokalizacji “outputs\logs.db”
 ```
-## InstalacjaPython
+## Instalacja Python
 
 ```
-ProjektnapisanyjestwjęzykuPython.Abymócgoobsługiwać(przezpliki.py)
-należyzainstalowaćPython,wedługnastępującychkroków:
-● wejśćnastronehttps://www.python.org/downloads/orazpobraćnajonwsząwersję
-(kliknąćżółtyprzycisk“DownloadPython[najnowszawersja])
-● uruchomićinstalator-otworzyćpobranyplik.exe
-● upewnićsię,żepole"AddPythontoPATH"jestzaznaczone(dółokna)
-● kliknąć"InstallNow"ipostępowaćzgodniezinstrukcjamiinstalatora
+Projekt napisany jest w języku Python. Aby móc go obsługiwać (przez pliki .py) należy zainstalować Python, według następujących kroków:
+● wejść na strone https://www.python.org/downloads/ oraz pobrać najonwszą wersję (kliknąć żółty przycisk “Download Python [najnowsza wersja])
+● uruchomić instalator - otworzyć pobrany plik .exe
+● upewnić się, że pole "Add Python to PATH" jest zaznaczone (dół okna)
+● kliknąć "Install Now" i postępować zgodnie z instrukcjami instalatora
 ```
 ```
-PozakończeniuinstalacjizweryfikowaćczyPythonzostałpoprawniezainstalowany:
-● otworzyćwierszpoleceń
-● wpisać“python--version”lub“python3--version”
-Jeślizwróconainformacjaniejestbłędemoznacza,żePyhonzostałzainstalowany
-pomyślnie.
+Po zakończeniu instalacji zweryfikować czy Python został poprawnie zainstalowany:
+● otworzyć wiersz poleceń
+● wpisać “python --version” lub “python3 --version”. Jeśli zwrócona informacja nie jest błędem oznacza, że Pyhon został zainstalowany pomyślnie
 ```
 ```
-Czasamidodatkowotrzebazrestartowaćurządzenie.
+Czasami dodatkowo trzeba zrestartować urządzenie.
 ```
-## Instalacjapip
+## Instalacja pip
 
 ```
-Programkorzystazszeregubibliotek,którenależyzainstalowaćprzypomocy‘pip’.
-WwiększościprzypadkówpipjestinstalowanyrazemzPython-em.Abysprawdzić
-czypipjestzainstalowanynanaszymurządzeniunależyotworzyćwierszpoleceńi
-wpisać“pip--version”.Jeślizwróconawartośćniejestbłędemoznacza,żepipzostał
-jużwcześniejzainstalowany.Wprzeciwnymwypadkunależy:
-● otworzyćwierszpoleceń
-● wpisać“python-mensurepip--upgrade”
-● ponowniezweryfikowaćobecnośćpipnaurządzeniuprzezwpisanie“pip--version”w
-wierszupoleceń
+Program korzysta z szeregu bibliotek, które należy zainstalować przy pomocy ‘pip’. W większości przypadków pip jest instalowany razem z Python-em. Aby sprawdzić czy pip jest zainstalowany na naszym urządzeniu należy otworzyć wiersz poleceń i wpisać “pip --version”. Jeśli zwrócona wartość nie jest błędem oznacza, że pip został już wcześniej zainstalowany. W przeciwnym wypadku należy:
+● otworzyć wiersz poleceń
+● wpisać “python -m ensurepip --upgrade”
+● pponownie zweryfikować obecność pip na urządzeniu przez wpisanie “pip --version” w wierszu poleceń
 ```
 
-## Wykorzystanebiblioteki
+## Wykorzystane biblioteki
 
 ```
-Programwykorzystujenastępującebiblioteki:
+Program wykorzystuje następujące biblioteki:
 ● tk
 ● datetime
-Abyjezainstalowaćnależydlakażdejznichwwierszupoleceńużyćkomendy“pip
-install[nazwabiblioteki]”
+Aby je zainstalować należy dla każdej z nich w wierszu poleceń użyć komendy “pip install [nazwa biblioteki]”
 ```
-## ZnaczeniedanychwModbuswedługindeksów
+## Znaczenie danych w Modbus według indeksów
 
 ```
-● dataigodzina,zktórejpochodządane(kiedyzostałypobrane):
+● Znaczenie danych w Modbus według indeksów
 0 - rok, 1 - miesiąc, 2 - dzień, 3 - godzina, 4 - minuta, 5 - sekunda
-● 6:sygnałżycia
-● 10-48:pobranedane;wartościliczbowemnożonesąrazy10;kolejnośćtakjakw
-pliku;oznaczeniekierunkuwiatru"N"-"1","E"-"2","S"-"3","W"-"4"
+● 6: sygnałżycia
+● 10-48: pobrane dane; wartości liczbowe mnożone są razy 10; kolejność tak jak w pliku; oznaczenie kierunku wiatru "N"-"1", "E"-"2", "S"-"3", "W"-"4"
 ```
 ## Ustawienia
 
 ```
-Programposiadasystemustawień,wramachktóregomożnaustawić:
-● “updateTime”-ilośćsekund,poktórychpobieranesąnowedane.Domyślnie600.
-● “port”-numerportu,naktórymtransmitowanesądane.Domyślnie502.
-Ustawieniaprzechowywanesąwpliku.jsonznajdującymsięw
-“outputs\settings.json”.Jeśliprogramnieznajdzieplikuzustawieniamiwygeneruje
-gozwartościamidomyślnymi.
+Program posiada system ustawień, w ramach którego można ustawić:
+● “updateTime” - ilość sekund, po których pobierane są nowe dane. Domyślnie 600.
+● “port” - numer portu, na którym transmitowane są dane. Domyślnie 502.
+Ustawienia przechowywane są w pliku .json znajdującym się w “outputs\settings.json”. Jeśli program nie znajdzie pliku z ustawieniami wygeneruje go z wartościami domyślnymi.
 ```
 
