@@ -19,14 +19,12 @@ należy zainstalować Python, według następujących kroków:
 ● uruchomić instalator - otworzyć pobrany plik .exe
 ● upewnić się, że pole "Add Python to PATH" jest zaznaczone (dół okna)
 ● kliknąć "Install Now" i postępować zgodnie z instrukcjami instalatora
-```
-```
+
 Po zakończeniu instalacji zweryfikować czy Python został poprawnie zainstalowany:
 ● otworzyć wiersz poleceń
 ● wpisać “python --version” lub “python3 --version”. Jeśli zwrócona informacja
 nie jest błędem oznacza, że Pyhon został zainstalowany pomyślnie
-```
-```
+
 Czasami dodatkowo trzeba zrestartować urządzenie.
 ```
 ## Instalacja pip
